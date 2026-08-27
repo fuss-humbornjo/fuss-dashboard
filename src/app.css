@@ -1,0 +1,260 @@
+@import "tailwindcss";
+
+/* app toggles themes via a .dark class on the root, not the OS setting */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Terminal design language (see design/term_ui_*.jpeg)
+ * - near-black surfaces, hairline borders, no blue tint anywhere
+ * - green is the signal color (pass / active / focus)
+ * - white is the primary action color
+ * - magenta + cyan are secondary data accents
+ * - monospace for data, values and micro-labels
+ */
+
+:root {
+  /* sharp corners — round is for child */
+  --radius: 0rem;
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  /* recessed panel inside a card (chart / code areas) */
+  --inset: oklch(0.96 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.145 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.94 0 0);
+  --secondary-foreground: oklch(0.145 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.94 0 0);
+  --accent-foreground: oklch(0.145 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.65 0.19 155);
+  /* signal colors */
+  --success: oklch(0.65 0.19 155);
+  --success-foreground: oklch(0.985 0 0);
+  --info: oklch(0.6 0.12 220);
+  --warning: oklch(0.7 0.17 60);
+  --magenta: oklch(0.62 0.24 315);
+  --cyan: oklch(0.68 0.13 210);
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.967 0 0);
+  --card: oklch(0.175 0 0);
+  --card-foreground: oklch(0.967 0 0);
+  /* raised panel inside a card (chart / code areas) */
+  --inset: oklch(0.215 0 0);
+  --popover: oklch(0.19 0 0);
+  --popover-foreground: oklch(0.967 0 0);
+  --primary: oklch(0.967 0 0);
+  --primary-foreground: oklch(0.145 0 0);
+  --secondary: oklch(0.235 0 0);
+  --secondary-foreground: oklch(0.967 0 0);
+  --muted: oklch(0.235 0 0);
+  --muted-foreground: oklch(0.6 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.967 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 10%);
+  --ring: oklch(0.8 0.2 155);
+  /* signal colors */
+  --success: oklch(0.8 0.2 155);
+  --success-foreground: oklch(0.145 0 0);
+  --info: oklch(0.75 0.14 210);
+  --warning: oklch(0.78 0.16 70);
+  --magenta: oklch(0.74 0.23 315);
+  --cyan: oklch(0.82 0.13 195);
+  --sidebar: oklch(0.175 0 0);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+}
+
+@theme inline {
+  --font-sans:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-inset: var(--inset);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-info: var(--info);
+  --color-warning: var(--warning);
+  --color-magenta: var(--magenta);
+  --color-cyan: var(--cyan);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+}
+
+/* dotted chart-grid backdrop from the design cards */
+@utility bg-dots {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--foreground) 12%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 14px 14px;
+}
+
+/* diagonal hatch used for secondary / fallback data series */
+@utility bg-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in oklch, currentColor 55%, transparent) 0 1.5px,
+    transparent 1.5px 6px
+  );
+}
+
+/* micro label: mono, uppercase, tracked — the design's section labels */
+@utility text-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* scrollable without a visible scrollbar (content stays reachable) */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply min-h-svh w-full bg-background text-foreground;
+    margin: 0;
+    min-width: 320px;
+    font-family:
+      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--success) 30%, transparent);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* svelte-sonner toasts on the app tokens: flat card, hairline border, mono,
+   square corners; type color lands on the icon only. Selectors are prefixed
+   with `html` to out-specify the library's own (unlayered, unscoped) rules. */
+html [data-sonner-toaster] {
+  font-family: var(--font-mono);
+  --border-radius: var(--radius-lg);
+}
+
+html [data-sonner-toaster][data-sonner-theme="light"],
+html [data-sonner-toaster][data-sonner-theme="dark"] {
+  --normal-bg: var(--card);
+  --normal-bg-hover: var(--card);
+  --normal-border: var(--border);
+  --normal-border-hover: var(--border);
+  --normal-text: var(--card-foreground);
+  --success-bg: var(--card);
+  --success-border: var(--border);
+  --success-text: var(--card-foreground);
+  --info-bg: var(--card);
+  --info-border: var(--border);
+  --info-text: var(--card-foreground);
+  --warning-bg: var(--card);
+  --warning-border: var(--border);
+  --warning-text: var(--card-foreground);
+  --error-bg: var(--card);
+  --error-border: var(--border);
+  --error-text: var(--card-foreground);
+  --loading-bg: var(--card);
+  --loading-border: var(--border);
+  --loading-text: var(--card-foreground);
+}
+
+html [data-sonner-toast][data-styled="true"] {
+  gap: 10px;
+  padding: 12px 14px;
+  font-size: 0.75rem;
+  box-shadow: none;
+}
+
+html [data-sonner-toast][data-styled="true"][data-type="success"] [data-icon] {
+  color: var(--success);
+}
+html [data-sonner-toast][data-styled="true"][data-type="error"] [data-icon] {
+  color: var(--destructive);
+}
+html [data-sonner-toast][data-styled="true"][data-type="info"] [data-icon] {
+  color: var(--info);
+}
+html [data-sonner-toast][data-styled="true"][data-type="warning"] [data-icon] {
+  color: var(--warning);
+}
+
+html
+  [data-sonner-toaster][data-sonner-theme]
+  [data-sonner-toast]
+  [data-description] {
+  color: var(--muted-foreground);
+}

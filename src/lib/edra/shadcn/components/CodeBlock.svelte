@@ -8,7 +8,7 @@
 	import Check from '@lucide/svelte/icons/check';
 	import Copy from '@lucide/svelte/icons/copy';
 	import * as Command from '$lib/components/ui/command/index.js';
-	import { cn } from '$lib.js';
+	import { cn } from "$lib/utils.js";
 	import strings from '../../strings.js';
 	import { Sparkle } from '@lucide/svelte';
 	import Tooltip from './Tooltip.svelte';

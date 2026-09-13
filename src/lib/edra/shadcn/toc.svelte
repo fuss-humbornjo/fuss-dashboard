@@ -7,7 +7,7 @@
 
 <script lang="ts">
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import { cn } from '$lib.js';
+	import { cn } from "$lib/utils.js";
 	import { type TableOfContentData } from '@tiptap/extension-table-of-contents';
 </script>
 

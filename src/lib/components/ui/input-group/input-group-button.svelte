@@ -22,9 +22,9 @@ export type InputGroupButtonSize = VariantProps<
 </script>
 
 <script lang="ts">
-import { Button } from "$components/ui/button/index.js";
-import { cn } from "$lib.js";
 import type { ComponentProps } from "svelte";
+import { Button } from "$components/ui/button/index.js";
+import { cn } from "$lib/utils.js";
 
 let {
   ref = $bindable(null),

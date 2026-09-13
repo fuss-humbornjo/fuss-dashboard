@@ -4,7 +4,7 @@
 	import mermaid from 'mermaid';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import { cn } from '$lib.js';
+	import { cn } from "$lib/utils.js";
 	import Workflow from '@lucide/svelte/icons/workflow';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Copy from '@lucide/svelte/icons/copy';

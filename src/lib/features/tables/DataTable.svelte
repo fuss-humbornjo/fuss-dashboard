@@ -10,7 +10,7 @@ import {
   Search,
 } from "@lucide/svelte";
 import { FlexRender, type SvelteTable } from "@tanstack/svelte-table";
-import PageHeading from "../../components/PageHeading.svelte";
+import PageHeading from "../../components/layout/page-heading.svelte";
 import { SelectSimple as Select } from "../../components/ui/select/index.js";
 
 type Filter = {

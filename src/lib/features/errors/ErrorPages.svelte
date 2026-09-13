@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import * as THREE from "three";
-import PageHeading from "../../components/PageHeading.svelte";
+import PageHeading from "../../components/layout/page-heading.svelte";
 
 let {
   path,

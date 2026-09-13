@@ -2,7 +2,7 @@
 import { ChevronRight, ChevronsUpDown, PanelLeft } from "@lucide/svelte";
 import { Separator } from "../ui/separator";
 import { type NavItem, navGroups } from "./navigation";
-import UserMenu from "./UserMenu.svelte";
+import UserMenu from "./user-menu.svelte";
 
 let {
   path,

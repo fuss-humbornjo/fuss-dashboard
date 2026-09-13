@@ -9,7 +9,7 @@
 		TableColMenu,
 		TableRowMenu
 	} from './components/menu/index.js';
-	import { cn } from '$lib.js';
+	import { cn } from "$lib/utils.js";
 
 	interface Props {
 		class?: string;

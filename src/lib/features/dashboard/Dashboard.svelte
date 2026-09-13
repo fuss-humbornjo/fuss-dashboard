@@ -7,7 +7,7 @@ import {
   Package,
   Users,
 } from "@lucide/svelte";
-import PageHeading from "../../components/PageHeading.svelte";
+import PageHeading from "../../components/layout/page-heading.svelte";
 
 let tab = $state<"overview" | "analytics">("overview");
 let range = $state("6m");

@@ -19,7 +19,7 @@
 	import { commands, type EdraCommand } from '../commands/index.ts';
 	import { quickcolors } from '../utils.ts';
 	import { getEditor, useEditorTransaction } from '../tiptap/index.ts';
-	import { cn } from '$lib.js';
+	import { cn } from "$lib/utils.js";
 
 	interface Props {
 		type?: 'simple' | 'extended';

@@ -7,7 +7,7 @@ export type SelectOption = {
 </script>
 
 <script lang="ts">
-import { cn } from "$lib.js";
+import { cn } from "$lib/utils.js";
 import Root from "./select.svelte";
 import Content from "./select-content.svelte";
 import Item from "./select-item.svelte";

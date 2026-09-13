@@ -5,7 +5,7 @@ import {
   type ButtonVariant,
   buttonVariants,
 } from "$components/ui/button/index.js";
-import { cn } from "$lib.js";
+import { cn } from "$lib/utils.js";
 
 let {
   ref = $bindable(null),

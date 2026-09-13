@@ -7,7 +7,7 @@ import {
   UserCog,
 } from "@lucide/svelte";
 import LanguageCombobox from "../../components/LanguageCombobox.svelte";
-import PageHeading from "../../components/PageHeading.svelte";
+import PageHeading from "../../components/layout/page-heading.svelte";
 import { Checkbox } from "../../components/ui/checkbox/index.js";
 import {
   RadioGroup,

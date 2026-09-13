@@ -3,7 +3,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "$lib.js": ["$lib.ts"],
       "$lib/*": ["src/lib/*"],
       "$components/*": ["src/lib/components/*"],
       "$app/environment": ["src/lib/shims/app-environment.ts"]

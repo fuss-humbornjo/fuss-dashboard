@@ -1,8 +1,8 @@
 <script lang="ts">
 import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
 import { Toaster } from "svelte-sonner";
-import AppHeader from "./lib/components/layout/AppHeader.svelte";
-import AppSidebar from "./lib/components/layout/AppSidebar.svelte";
+import AppHeader from "./lib/components/layout/app-header.svelte";
+import AppSidebar from "./lib/components/layout/app-sidebar.svelte";
 import { navGroups } from "./lib/components/layout/navigation";
 import Authentication from "./lib/features/auth/Authentication.svelte";
 import Dashboard from "./lib/features/dashboard/Dashboard.svelte";

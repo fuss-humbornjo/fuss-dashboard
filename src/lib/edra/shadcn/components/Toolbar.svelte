@@ -3,7 +3,7 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { commands } from '../../commands/index.js';
 	import { addAIHighlight, getEditor, useEditorTransaction } from '../../tiptap/index.js';
-	import { cn } from '$lib.js';
+	import { cn } from "$lib/utils.js";
 	import { WandSparkles } from '@lucide/svelte';
 	import Colors from './tools/Colors.svelte';
 	import Export from './tools/Export.svelte';

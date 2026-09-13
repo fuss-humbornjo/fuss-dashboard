@@ -2,7 +2,7 @@
 	import { NodeViewContent, NodeViewWrapper, type NodeViewProps } from '../../tiptap/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { cn } from '$lib.js';
+	import { cn } from "$lib/utils.js";
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 
 	const { node, updateAttributes }: NodeViewProps = $props();

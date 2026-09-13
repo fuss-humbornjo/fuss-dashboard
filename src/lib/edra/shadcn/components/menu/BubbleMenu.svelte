@@ -9,7 +9,7 @@
 		isTextSelection,
 		useEditorTransaction
 	} from '../../../tiptap/index.js';
-	import { cn } from '$lib.js';
+	import { cn } from "$lib/utils.js";
 	import { WandSparkles } from '@lucide/svelte';
 	import Colors from '../tools/Colors.svelte';
 	import Tooltip from '../Tooltip.svelte';

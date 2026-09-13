@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Plus, Puzzle } from "@lucide/svelte";
 import { createQuery, useQueryClient } from "@tanstack/svelte-query";
-import PageHeading from "../../components/PageHeading.svelte";
+import PageHeading from "../../components/layout/page-heading.svelte";
 import { Input } from "../../components/ui/input";
 import { SelectSimple as Select } from "../../components/ui/select/index.js";
 import { listAllSkills, listScopes } from "./api";

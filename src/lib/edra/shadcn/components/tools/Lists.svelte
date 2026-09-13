@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { cn } from '$lib.js';
+	import { cn } from "$lib/utils.js";
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Minus from '@lucide/svelte/icons/minus';
 	import { commands } from '../../../commands/index.js';

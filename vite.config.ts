@@ -25,7 +25,6 @@ export default defineConfig(({ mode }) => {
     publicDir: "static",
     resolve: {
       alias: {
-        "$lib.js": `${projectRoot}/$lib.ts`,
         "$app/environment": `${projectRoot}/src/lib/shims/app-environment.ts`,
         $components: `${projectRoot}/src/lib/components`,
         $lib: `${projectRoot}/src/lib`,

@@ -55,12 +55,12 @@ const activate = (item: NavItem) => {
 
 <aside
   class:translate-x-0={open}
-  class={`fixed inset-y-0 left-0 z-40 flex h-svh min-h-0 min-w-0 w-64 shrink-0 -translate-x-full flex-col overflow-x-hidden border-r bg-sidebar transition-[width,transform] duration-200 ease-linear lg:static lg:translate-x-0 lg:p-2 ${offcanvas ? "lg:w-0 lg:overflow-hidden" : collapsed ? "lg:w-16" : "lg:w-64"}`}
+  class={`fixed inset-y-0 left-0 z-40 flex h-svh min-h-0 min-w-0 w-64 shrink-0 -translate-x-full flex-col overflow-x-hidden border-r bg-sidebar transition-[width,transform] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] lg:static lg:translate-x-0 lg:p-2 ${offcanvas ? "lg:w-0 lg:overflow-hidden" : collapsed ? "lg:w-16" : "lg:w-64"}`}
 >
   <div class="h-16 shrink-0 p-2">
     <button
       type="button"
-      class={`pointer-events-none flex h-12 w-full items-center gap-2 rounded-md p-2 transition-[width,height,padding,margin,background-color] duration-200 ease-linear hover:bg-sidebar-accent lg:pointer-events-auto ${collapsed ? "lg:size-8 lg:p-0" : "lg:-mt-2"}`}
+      class={`pointer-events-none flex h-12 w-full items-center gap-2 rounded-md p-2 transition-[width,height,padding,margin,background-color] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-sidebar-accent lg:pointer-events-auto ${collapsed ? "lg:size-8 lg:p-0" : "lg:-mt-2"}`}
       aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       onclick={onToggleSidebar}
     >
@@ -79,7 +79,7 @@ const activate = (item: NavItem) => {
         >
       </div>
       <div
-        class={`grid min-w-0 flex-1 overflow-hidden text-left leading-tight transition-[max-width,opacity] duration-200 ease-linear ${collapsed ? "lg:max-w-0 lg:opacity-0" : "lg:max-w-[15rem]"}`}
+        class={`grid min-w-0 flex-1 overflow-hidden text-left leading-tight transition-[max-width,opacity] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${collapsed ? "lg:max-w-0 lg:opacity-0 lg:delay-0" : "lg:max-w-[15rem] lg:delay-75"}`}
       >
         <span class="truncate text-sm font-semibold">{team.name}</span>
         <span class="truncate font-mono text-[11px] text-muted-foreground"
@@ -88,51 +88,55 @@ const activate = (item: NavItem) => {
       </div>
       <PanelLeft
         size={16}
-        class={`ml-auto shrink-0 text-muted-foreground transition-[width,opacity] duration-200 ease-linear ${collapsed ? "lg:w-0 lg:overflow-hidden lg:opacity-0" : "lg:w-4"}`}
+        class={`ml-auto shrink-0 text-muted-foreground transition-[width,opacity] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${collapsed ? "lg:w-0 lg:overflow-hidden lg:opacity-0 lg:delay-0" : "lg:w-4 lg:delay-75"}`}
       />
     </button>
   </div>
 
   <div
-    class={`nav-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-4 transition-[padding] duration-200 ease-linear ${collapsed ? "lg:py-0" : ""}`}
+    class="nav-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-4"
   >
-    {#each navGroups as group (group.title)}
-      <div class="mb-7">
+    {#each navGroups as group, i (group.title)}
+      <div
+        class={`mb-7 transition-[margin] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${collapsed ? "lg:mb-0" : ""}`}
+      >
         <p
-          class={`mb-2 px-2 text-label text-muted-foreground transition-[margin,opacity] duration-200 ease-linear ${collapsed ? "lg:-mt-8 lg:opacity-0" : ""}`}
+          class={`mb-2 max-h-6 overflow-hidden px-2 text-label text-muted-foreground transition-[max-height,opacity,margin] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${collapsed ? "lg:mb-0 lg:max-h-0 lg:opacity-0 lg:delay-0" : "lg:delay-75"}`}
         >
           {group.title}
         </p>
-        <div
-          class={`overflow-hidden transition-[max-height,opacity,margin] duration-200 ease-linear ${collapsed ? "lg:mb-2 lg:max-h-4 lg:opacity-100" : "max-h-0 opacity-0"}`}
-        >
-          <Separator />
-        </div>
+        {#if i > 0}
+          <div
+            class={`overflow-hidden transition-[max-height,opacity,margin] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${collapsed ? "lg:my-2 lg:max-h-4 lg:opacity-100 lg:delay-75" : "max-h-0 opacity-0"}`}
+          >
+            <Separator />
+          </div>
+        {/if}
         <nav class="space-y-1" aria-label={group.title}>
           {#each group.items as item (item.label)}
             {@const Icon = item.icon}
             <button
               type="button"
-              class={`flex h-8 w-full items-center gap-2 overflow-hidden rounded-md px-2 font-mono text-[11px] uppercase tracking-wider transition-[width,height,padding,background-color,color] duration-200 ease-linear ${collapsed ? "lg:size-8 lg:justify-center lg:gap-0 lg:p-0" : ""} ${isActive(item) ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`}
+              class={`flex h-8 w-full items-center gap-2 overflow-hidden rounded-md px-2 font-mono text-[11px] uppercase tracking-wider transition-colors duration-200 ${isActive(item) ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`}
               title={collapsed ? item.label : undefined}
               aria-expanded={item.children ? isExpanded(item) : undefined}
               onclick={() => activate(item)}
             >
               <Icon size={16} strokeWidth={1.8} class="shrink-0" />
               <span
-                class={`flex min-w-0 flex-1 overflow-hidden whitespace-nowrap text-left transition-[max-width,opacity] duration-200 ease-linear ${collapsed ? "lg:max-w-0 lg:opacity-0" : "lg:max-w-[15rem]"}`}
+                class={`flex min-w-0 flex-1 overflow-hidden whitespace-nowrap text-left transition-[max-width,opacity] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${collapsed ? "lg:max-w-0 lg:opacity-0 lg:delay-0" : "lg:max-w-[15rem] lg:delay-75"}`}
                 >{item.label}</span
               >
               {#if item.badge}
                 <span
-                  class={`max-w-8 overflow-hidden whitespace-nowrap rounded border border-success/25 bg-success/10 px-1.5 py-0.5 font-mono text-[10px] text-success transition-[max-width,opacity,padding] duration-200 ease-linear ${collapsed ? "lg:max-w-0 lg:border-0 lg:px-0 lg:opacity-0" : ""}`}
+                  class={`max-w-8 overflow-hidden whitespace-nowrap rounded border border-success/25 bg-success/10 px-1.5 py-0.5 font-mono text-[10px] text-success transition-[max-width,opacity,padding] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${collapsed ? "lg:max-w-0 lg:border-0 lg:px-0 lg:opacity-0 lg:delay-0" : "lg:delay-75"}`}
                   >{item.badge}</span
                 >
               {/if}
               {#if item.children}
                 <ChevronRight
                   size={15}
-                  class={`shrink-0 transition-[width,opacity,transform] duration-200 ease-linear ${isExpanded(item) ? "rotate-90" : ""} ${collapsed ? "lg:w-0 lg:overflow-hidden lg:opacity-0" : "lg:w-4"}`}
+                  class={`shrink-0 transition-[width,opacity,transform] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${isExpanded(item) ? "rotate-90" : ""} ${collapsed ? "lg:w-0 lg:overflow-hidden lg:opacity-0 lg:delay-0" : "lg:w-4 lg:delay-75"}`}
                 />
               {/if}
             </button>
@@ -143,7 +147,7 @@ const activate = (item: NavItem) => {
                 {#each item.children as child (child.href)}
                   <button
                     type="button"
-                    class={`flex h-7 w-full items-center gap-2 rounded-md px-2 text-left font-mono text-[11px] uppercase tracking-wider transition-[background-color,color] duration-200 ease-linear ${child.href === path ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`}
+                    class={`flex h-7 w-full items-center gap-2 rounded-md px-2 text-left font-mono text-[11px] uppercase tracking-wider transition-colors duration-200 ${child.href === path ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`}
                     onclick={() => onNavigate(child.href)}
                   >
                     {#if child.icon}
@@ -161,12 +165,12 @@ const activate = (item: NavItem) => {
     {/each}
   </div>
 
-  <div class="shrink-0 border-t p-2 lg:pb-0">
-    <UserMenu side="top" align="start" {onNavigate}>
+  <div class="flex h-16 shrink-0 items-center border-t p-2 lg:pb-0">
+    <UserMenu side="top" align="start">
       {#snippet trigger(open, toggle)}
         <button
           type="button"
-          class={`flex w-full items-center gap-3 rounded-md px-2 py-2 text-left transition-[width,height,padding,background-color] duration-200 ease-linear hover:bg-sidebar-accent ${collapsed ? "lg:size-8 lg:p-0" : ""}`}
+          class={`flex h-12 w-full items-center gap-2 rounded-md p-2 text-left transition-[width,height,padding,background-color] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-sidebar-accent ${collapsed ? "lg:size-8 lg:p-0" : ""}`}
           aria-label="Open account menu"
           aria-expanded={open}
           onclick={toggle}
@@ -177,7 +181,7 @@ const activate = (item: NavItem) => {
             SN
           </div>
           <div
-            class={`min-w-0 flex-1 overflow-hidden transition-[max-width,opacity] duration-200 ease-linear ${collapsed ? "lg:max-w-0 lg:opacity-0" : "lg:max-w-[15rem]"}`}
+            class={`min-w-0 flex-1 overflow-hidden transition-[max-width,opacity] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${collapsed ? "lg:max-w-0 lg:opacity-0 lg:delay-0" : "lg:max-w-[15rem] lg:delay-75"}`}
           >
             <p class="truncate text-sm font-medium">satnaing</p>
             <p class="truncate text-xs text-muted-foreground">
@@ -185,7 +189,7 @@ const activate = (item: NavItem) => {
             </p>
           </div>
           <ChevronsUpDown
-            class={`ml-auto shrink-0 text-muted-foreground transition-[width,opacity] duration-200 ease-linear ${collapsed ? "lg:w-0 lg:overflow-hidden lg:opacity-0" : "lg:w-4"}`}
+            class={`ml-auto shrink-0 text-muted-foreground transition-[width,opacity] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${collapsed ? "lg:w-0 lg:overflow-hidden lg:opacity-0 lg:delay-0" : "lg:w-4 lg:delay-75"}`}
             size={16}
           />
         </button>

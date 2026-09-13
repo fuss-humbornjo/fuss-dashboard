@@ -1,17 +1,15 @@
 <script lang="ts">
-import { CreditCard, LogOut, Settings2, User, Users } from "@lucide/svelte";
+import { CreditCard, LogOut, User, Users } from "@lucide/svelte";
 import type { Snippet } from "svelte";
 
 let {
   trigger,
   side = "bottom",
   align = "end",
-  onNavigate,
 }: {
   trigger: Snippet<[open: boolean, toggle: () => void]>;
   side?: "top" | "bottom";
   align?: "start" | "end";
-  onNavigate: (href: string) => void;
 } = $props();
 
 let open = $state(false);
@@ -35,11 +33,6 @@ const handleKeydown = (event: KeyboardEvent) => {
 const handleClick = (event: MouseEvent) => {
   if (!open || !(event.target instanceof Node)) return;
   if (wrapper.contains(event.target) || menuEl?.contains(event.target)) return;
-  close();
-};
-
-const go = (href: string) => {
-  onNavigate(href);
   close();
 };
 
@@ -103,13 +96,6 @@ function portal(node: HTMLElement) {
       class="flex w-full items-center gap-2 rounded px-2 py-2 text-sm hover:bg-muted"
     >
       <CreditCard size={15} />Billing
-    </button>
-    <button
-      type="button"
-      class="flex w-full items-center gap-2 rounded px-2 py-2 text-sm hover:bg-muted"
-      onclick={() => go("/settings")}
-    >
-      <Settings2 size={15} />Settings
     </button>
     <button
       type="button"

@@ -1,12 +1,5 @@
 <script lang="ts">
-import {
-  Aperture,
-  Moon,
-  PanelLeft,
-  Search,
-  Settings2,
-  Sun,
-} from "@lucide/svelte";
+import { Aperture, Moon, PanelLeft, Search, Sun } from "@lucide/svelte";
 import * as Breadcrumb from "../ui/breadcrumb/index.js";
 import { Button } from "../ui/button/index.js";
 import { type Breadcrumb as Crumb, featureCrumbs } from "./breadcrumbs.svelte";
@@ -31,10 +24,7 @@ let {
 let searchOpen = $state(false);
 let searchQuery = $state("");
 
-const shortcuts = [
-  { label: "Dashboard", href: "/", icon: Aperture },
-  { label: "Settings", href: "/settings", icon: Settings2 },
-];
+const shortcuts = [{ label: "Dashboard", href: "/", icon: Aperture }];
 const filteredShortcuts = $derived(
   shortcuts.filter((item) =>
     item.label.toLowerCase().includes(searchQuery.trim().toLowerCase()),

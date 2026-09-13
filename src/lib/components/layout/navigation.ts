@@ -1,21 +1,10 @@
 import {
   Aperture,
-  Bell,
-  Bug,
   CircleHelp,
-  Construction,
-  FileX,
   Folder,
   type LucideIcon,
-  Monitor,
-  Palette,
   Puzzle,
-  ServerOff,
-  Settings,
   ShieldCheck,
-  UserCog,
-  UserX,
-  Wrench,
 } from "@lucide/svelte";
 
 export type NavItem = {
@@ -49,46 +38,10 @@ export const navGroups: { title: string; items: NavItem[] }[] = [
           { label: "OTP", href: "/otp" },
         ],
       },
-      {
-        label: "Errors",
-        icon: Bug,
-        children: [
-          { label: "Forbidden", href: "/errors/forbidden", icon: UserX },
-          { label: "Not Found", href: "/errors/not-found", icon: FileX },
-          {
-            label: "Internal Server Error",
-            href: "/errors/internal-server-error",
-            icon: ServerOff,
-          },
-          {
-            label: "Maintenance Error",
-            href: "/errors/maintenance-error",
-            icon: Construction,
-          },
-        ],
-      },
     ],
   },
   {
     title: "Other",
-    items: [
-      {
-        label: "Settings",
-        href: "/settings",
-        icon: Settings,
-        children: [
-          { label: "Profile", href: "/settings", icon: UserCog },
-          { label: "Account", href: "/settings/account", icon: Wrench },
-          { label: "Appearance", href: "/settings/appearance", icon: Palette },
-          {
-            label: "Notifications",
-            href: "/settings/notifications",
-            icon: Bell,
-          },
-          { label: "Display", href: "/settings/display", icon: Monitor },
-        ],
-      },
-      { label: "Help Center", href: "/help-center", icon: CircleHelp },
-    ],
+    items: [{ label: "Help Center", href: "/help-center", icon: CircleHelp }],
   },
 ];

@@ -4,10 +4,9 @@ import { Toaster } from "svelte-sonner";
 import AppHeader from "./lib/components/layout/app-header.svelte";
 import AppSidebar from "./lib/components/layout/app-sidebar.svelte";
 import { navGroups } from "./lib/components/layout/navigation";
+import { ErrorPage } from "./lib/components/ui/error-page";
 import Authentication from "./lib/features/auth/Authentication.svelte";
 import Dashboard from "./lib/features/dashboard/Dashboard.svelte";
-import ErrorPages from "./lib/features/errors/ErrorPages.svelte";
-import Settings from "./lib/features/settings/Settings.svelte";
 import Projects from "./lib/service/agent/projects.svelte";
 import SkillDetail from "./lib/service/registry/skill-detail.svelte";
 import Skills from "./lib/service/registry/skills.svelte";
@@ -40,23 +39,7 @@ const authPaths = [
   "/clerk/sign-in",
   "/clerk/sign-up",
 ];
-const errorPaths = [
-  "/errors/forbidden",
-  "/errors/not-found",
-  "/errors/internal-server-error",
-  "/errors/maintenance-error",
-];
-const standaloneErrorPaths = ["/403", "/404", "/500", "/503"];
-const errorPageTitles: Record<string, string> = {
-  "/403": "Forbidden",
-  "/404": "Not found",
-  "/500": "Internal server error",
-  "/503": "Maintenance",
-};
-const standalone = $derived(
-  authPaths.includes(path) || standaloneErrorPaths.includes(path),
-);
-const isNestedError = $derived(errorPaths.includes(path));
+const standalone = $derived(authPaths.includes(path));
 const layout = $derived<LayoutMode>(
   sidebarExpanded
     ? "default"
@@ -71,27 +54,22 @@ const sidebarOffcanvas = $derived(
   !sidebarExpanded && sidebarCollapseMode === "offcanvas",
 );
 const current = $derived(
-  errorPageTitles[path] ??
-    navGroups
-      .flatMap((group) => group.items)
-      .flatMap((item) => [
-        { label: item.label, href: item.href },
-        ...(item.children ?? []),
-      ])
-      .find((item) => item.href === path)?.label ??
+  navGroups
+    .flatMap((group) => group.items)
+    .flatMap((item) => [
+      { label: item.label, href: item.href },
+      ...(item.children ?? []),
+    ])
+    .find((item) => item.href === path)?.label ??
     (path.startsWith("/projects")
       ? "Projects"
       : path.startsWith("/skills")
         ? "Skills"
-        : path.startsWith("/settings")
-          ? "Settings"
-          : path.startsWith("/errors")
-            ? "Error pages"
-            : path.startsWith("/clerk")
-              ? "Secured by Clerk"
-              : authPaths.includes(path)
-                ? "Authentication"
-                : "Not found"),
+        : path.startsWith("/clerk")
+          ? "Secured by Clerk"
+          : authPaths.includes(path)
+            ? "Authentication"
+            : "Not found"),
 );
 
 const navigate = (href: string) => {
@@ -120,13 +98,7 @@ const onPopState = () => {
   <div class="min-h-screen bg-background text-foreground">
     {#if standalone}
       <main id="main-content" class="h-svh overflow-hidden">
-        {#if authPaths.includes(path)}
-          <Authentication {path} {dark} onNavigate={navigate} />
-        {:else}
-          {#key path}
-            <ErrorPages {path} onNavigate={navigate} standalone />
-          {/key}
-        {/if}
+        <Authentication {path} {dark} onNavigate={navigate} />
       </main>
     {:else}
       <div class="flex h-svh min-h-0 overflow-hidden">
@@ -167,25 +139,14 @@ const onPopState = () => {
                 {#key path}
                   <SkillDetail {path} onNavigate={navigate} />
                 {/key}
-              {:else if path.startsWith("/settings")}
-                <Settings
-                  {path}
-                  onNavigate={navigate}
-                  onSetDark={(value) => (dark = value)}
-                />
               {:else if path === "/auth"}
                 <Authentication {path} {dark} onNavigate={navigate} />
-              {:else if path === "/errors"}
-                {#key path}
-                  <ErrorPages {path} onNavigate={navigate} />
-                {/key}
-              {:else if isNestedError}
-                {#key path}
-                  <ErrorPages {path} onNavigate={navigate} />
-                {/key}
               {:else}
                 {#key path}
-                  <ErrorPages path="/errors/404" onNavigate={navigate} />
+                  <ErrorPage
+                    errcode={404}
+                    message="It seems like the page you're looking for does not exist or might have been removed."
+                  />
                 {/key}
               {/if}
             </div>

@@ -64,7 +64,7 @@ const queryClient = useQueryClient();
 
 const projectsQuery = createInfiniteQuery(() => ({
   queryKey: ["agent", "projects"],
-  queryFn: ({ pageParam }) => listProjects(pageParam),
+  queryFn: ({ pageParam }) => listProjects({ page_token: pageParam }),
   initialPageParam: "",
   getNextPageParam: (last) => last.next_page_token || undefined,
   enabled: !projectId,
@@ -73,13 +73,14 @@ const projectsQuery = createInfiniteQuery(() => ({
 // Stays enabled on session routes too: the breadcrumb shows the project name.
 const projectQuery = createQuery(() => ({
   queryKey: ["agent", "projects", projectId],
-  queryFn: () => findProject(projectId),
+  queryFn: () => findProject({ id: projectId }),
   enabled: !!projectId && !creating,
 }));
 
 const sessionsQuery = createInfiniteQuery(() => ({
   queryKey: ["agent", "sessions", projectId],
-  queryFn: ({ pageParam }) => listSessions(projectId, pageParam),
+  queryFn: ({ pageParam }) =>
+    listSessions({ project_id: projectId, page_token: pageParam }),
   initialPageParam: "",
   getNextPageParam: (last) => last.next_page_token || undefined,
   enabled: !!projectId && !creating && !sessionId && !settings,
@@ -88,7 +89,7 @@ const sessionsQuery = createInfiniteQuery(() => ({
 const sessionQuery = createQuery(() => ({
   queryKey: ["agent", "session", sessionId],
   queryFn: async () => {
-    const result = await getSession(sessionId);
+    const result = await getSession({ session_id: sessionId });
     if (result.project_id !== projectId)
       throw new Error("This session does not belong to this project.");
     return result;
@@ -252,7 +253,7 @@ function submitProject(event: SubmitEvent) {
 
 const createSessionMutation = createMutation(() => ({
   mutationFn: (name?: string) =>
-    createSession(projectId, { ...(name ? { name } : {}) }),
+    createSession({ project_id: projectId, ...(name ? { name } : {}) }),
   onSuccess: (created) => {
     queryClient.invalidateQueries({
       queryKey: ["agent", "sessions", projectId],
@@ -269,7 +270,7 @@ function submitSession(event: SubmitEvent) {
 
 const saveSessionMutation = createMutation(() => ({
   mutationFn: ({ snapshot, masks }: { snapshot: Session; masks: string[] }) =>
-    updateSession(snapshot, masks),
+    updateSession({ session: snapshot, update_masks: masks }),
   onSuccess: async (updated) => {
     // Read the durable snapshot back before confirming the save.
     await queryClient.invalidateQueries({
@@ -296,7 +297,7 @@ async function saveSession(name: string, config: AgentConfig): Promise<void> {
 
 const saveProjectMutation = createMutation(() => ({
   mutationFn: ({ snapshot, masks }: { snapshot: Project; masks: string[] }) =>
-    updateProject(snapshot, masks),
+    updateProject({ project: snapshot, update_masks: masks }),
   onSuccess: async () => {
     // Read the durable snapshot back before confirming the save; the
     // projects key covers both the list and the detail queries.

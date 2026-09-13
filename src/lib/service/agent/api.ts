@@ -3,15 +3,18 @@
 // fuss/command/api/api.go) and its CUE sources in
 // fuss/service/agent/schema/v1 + fuss/package/{agent,mcpx,skillx}.
 //
-// Responses are validated at the boundary; unknown fields on config objects
-// survive parsing (loose schemas) so the draft/wire editing model can carry
-// fields it does not manage.
+// Every operation follows the protobuf RPC shape: one <op>Request
+// message in, one <op>Response message out, both zod-validated at the
+// boundary (see ../rpc.ts). Responses are validated at the boundary;
+// unknown fields on config objects survive parsing (loose schemas) so
+// the draft/wire editing model can carry fields it does not manage.
 
 import { z } from "zod";
 import {
   type AgentConfig,
   agentConfigSchema,
 } from "../../package/agent/config";
+import { defineRpc } from "../rpc";
 
 export type { AgentConfig } from "../../package/agent/config";
 export type { McpConfig, McpTransport } from "../../package/mcpx/config";
@@ -19,6 +22,8 @@ export type { SkillConfig } from "../../package/skillx/config";
 export { agentConfigSchema };
 
 const timestamp = z.iso.datetime({ offset: true });
+
+// --- resource messages -------------------------------------------------
 
 export const projectSchema = z.object({
   id: z.uuid(),
@@ -30,7 +35,6 @@ export const projectSchema = z.object({
   created_at: timestamp,
   updated_at: timestamp,
 });
-
 export type Project = z.infer<typeof projectSchema>;
 
 export const sessionNameSchema = z.string().min(1).max(64);
@@ -47,141 +51,186 @@ export const sessionSchema = z.object({
   updated_at: timestamp,
   last_activity_at: timestamp,
 });
-
 export type Session = z.infer<typeof sessionSchema>;
 
+// --- pagination ---------------------------------------------------------
+
+const pageSize = z.number().int().min(1).default(20);
+const pageToken = z.string().default("");
+
+// --- listProjects --------------------------------------------------------
+
+export const listProjectsRequestSchema = z.object({
+  page_size: pageSize,
+  page_token: pageToken,
+});
+export type ListProjectsRequest = z.input<typeof listProjectsRequestSchema>;
 export const listProjectsResponseSchema = z.object({
   projects: z.array(projectSchema),
   next_page_token: z.string(),
 });
+export type ListProjectsResponse = z.infer<typeof listProjectsResponseSchema>;
 
+export const listProjects = defineRpc({
+  service: "agent",
+  name: "listProjects",
+  requestSchema: listProjectsRequestSchema,
+  responseSchema: listProjectsResponseSchema,
+  path: (req) =>
+    `/projects?page_size=${req.page_size}&page_token=${encodeURIComponent(req.page_token)}`,
+});
+
+// The service exposes no GET /projects/{id}; resolve one project by
+// scanning the (small, most-recently-updated-first) project pages.
+export async function findProject({ id }: { id: string }) {
+  let page_token = "";
+  do {
+    const result = await listProjects({ page_token });
+    const found = result.projects.find((item) => item.id === id);
+    if (found) return found;
+    page_token = result.next_page_token;
+  } while (page_token);
+  return null;
+}
+
+// --- listSessions --------------------------------------------------------
+
+export const listSessionsRequestSchema = z.object({
+  project_id: z.string(),
+  page_size: pageSize,
+  page_token: pageToken,
+});
+export type ListSessionsRequest = z.input<typeof listSessionsRequestSchema>;
 export const listSessionsResponseSchema = z.object({
   sessions: z.array(sessionSchema),
   next_page_token: z.string(),
 });
+export type ListSessionsResponse = z.infer<typeof listSessionsResponseSchema>;
 
-export class ApiError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-  ) {
-    super(message);
-  }
-}
+export const listSessions = defineRpc({
+  service: "agent",
+  name: "listSessions",
+  requestSchema: listSessionsRequestSchema,
+  responseSchema: listSessionsResponseSchema,
+  path: (req) =>
+    `/projects/${encodeURIComponent(req.project_id)}/sessions?page_size=${req.page_size}&page_token=${encodeURIComponent(req.page_token)}`,
+});
 
-export class SchemaError extends Error {
-  constructor(
-    message: string,
-    public cause: z.ZodError,
-  ) {
-    super(message);
-  }
-}
+// --- getSession ----------------------------------------------------------
 
-export async function request<S extends z.ZodType>(
-  path: string,
-  schema: S,
-  init: { method?: "GET" | "POST" | "PATCH" | "DELETE"; body?: unknown } = {},
-): Promise<z.output<S>> {
-  const { method = "GET", body } = init;
-  const response = await fetch(`/api/agent${path}`, {
-    method,
-    headers:
-      body === undefined ? undefined : { "Content-Type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  if (!response.ok) {
-    const messages: Record<number, string> = {
-      401: "Authentication failed. Check the dashboard’s service token.",
-      403: "Access to this resource was denied.",
-      404: "This resource or API endpoint is unavailable.",
-      409: "The resource changed or is busy. Refresh and try again.",
-    };
-    throw new ApiError(
-      response.status,
-      messages[response.status] ??
-        `Request failed (${response.status}). Your changes have not been confirmed.`,
-    );
-  }
-  const parsed = schema.safeParse(await response.json());
-  if (!parsed.success) {
-    console.error("Fuss API response failed schema validation", parsed.error);
-    throw new SchemaError(
-      "The Fuss API returned data in an unexpected format.",
-      parsed.error,
-    );
-  }
-  return parsed.data;
-}
+export const getSessionRequestSchema = z.object({
+  session_id: z.string(),
+});
+export type GetSessionRequest = z.input<typeof getSessionRequestSchema>;
+export const getSessionResponseSchema = sessionSchema;
+export type GetSessionResponse = z.infer<typeof getSessionResponseSchema>;
 
-export function listProjects(pageToken = "") {
-  return request(
-    `/projects?page_size=20&page_token=${encodeURIComponent(pageToken)}`,
-    listProjectsResponseSchema,
-  );
-}
+export const getSession = defineRpc({
+  service: "agent",
+  name: "getSession",
+  requestSchema: getSessionRequestSchema,
+  responseSchema: getSessionResponseSchema,
+  path: (req) => `/sessions/${encodeURIComponent(req.session_id)}`,
+});
 
-// The service exposes no GET /projects/{id}; resolve one project by scanning
-// the (small, most-recently-updated-first) project pages.
-export async function findProject(id: string) {
-  let token = "";
-  do {
-    const result = await listProjects(token);
-    const found = result.projects.find((item) => item.id === id);
-    if (found) return found;
-    token = result.next_page_token;
-  } while (token);
-  return null;
-}
+// --- createProject --------------------------------------------------------
 
-export function listSessions(projectId: string, pageToken = "") {
-  return request(
-    `/projects/${encodeURIComponent(projectId)}/sessions?page_size=20&page_token=${encodeURIComponent(pageToken)}`,
-    listSessionsResponseSchema,
-  );
-}
+export const createProjectRequestSchema = z.object({
+  source: z.string().min(1),
+  name: z.string().min(1),
+  external_id: z.string().optional(),
+});
+export type CreateProjectRequest = z.input<typeof createProjectRequestSchema>;
+export const createProjectResponseSchema = projectSchema;
+export type CreateProjectResponse = z.infer<typeof createProjectResponseSchema>;
 
-export function getSession(sessionId: string) {
-  return request(`/sessions/${encodeURIComponent(sessionId)}`, sessionSchema);
-}
+export const createProject = defineRpc({
+  service: "agent",
+  name: "createProject",
+  method: "POST",
+  requestSchema: createProjectRequestSchema,
+  responseSchema: createProjectResponseSchema,
+  path: () => "/projects:create",
+  body: (req) => req,
+});
 
-export function createProject(body: {
-  source: string;
-  name: string;
-  external_id?: string;
-}) {
-  return request("/projects:create", projectSchema, { method: "POST", body });
-}
+// --- createSession --------------------------------------------------------
 
-export function createSession(projectId: string, body: { name?: string }) {
-  return request(
-    `/projects/${encodeURIComponent(projectId)}/sessions`,
-    sessionSchema,
-    { method: "POST", body },
-  );
-}
+export const createSessionRequestSchema = z.object({
+  project_id: z.string(),
+  name: sessionNameSchema.optional(),
+});
+export type CreateSessionRequest = z.input<typeof createSessionRequestSchema>;
+export const createSessionResponseSchema = sessionSchema;
+export type CreateSessionResponse = z.infer<typeof createSessionResponseSchema>;
 
-export function updateProject(project: Project, updateMasks: string[]) {
-  return request(`/projects/${encodeURIComponent(project.id)}`, projectSchema, {
-    method: "PATCH",
-    body: { project, update_masks: updateMasks },
-  });
-}
+export const createSession = defineRpc({
+  service: "agent",
+  name: "createSession",
+  method: "POST",
+  requestSchema: createSessionRequestSchema,
+  responseSchema: createSessionResponseSchema,
+  path: (req) => `/projects/${encodeURIComponent(req.project_id)}/sessions`,
+  body: (req) => (req.name === undefined ? {} : { name: req.name }),
+});
 
-export function updateSession(session: Session, updateMasks: string[]) {
-  return request(`/sessions/${encodeURIComponent(session.id)}`, sessionSchema, {
-    method: "PATCH",
-    body: { session, update_masks: updateMasks },
-  });
-}
+// --- updateProject --------------------------------------------------------
 
-export function clearSession(sessionId: string) {
-  return request(
-    `/sessions/${encodeURIComponent(sessionId)}/clear`,
-    z.object({}),
-    { method: "POST" },
-  );
-}
+export const updateProjectRequestSchema = z.object({
+  project: projectSchema,
+  update_masks: z.array(z.string()),
+});
+export type UpdateProjectRequest = z.input<typeof updateProjectRequestSchema>;
+export const updateProjectResponseSchema = projectSchema;
+export type UpdateProjectResponse = z.infer<typeof updateProjectResponseSchema>;
+
+export const updateProject = defineRpc({
+  service: "agent",
+  name: "updateProject",
+  method: "PATCH",
+  requestSchema: updateProjectRequestSchema,
+  responseSchema: updateProjectResponseSchema,
+  path: (req) => `/projects/${encodeURIComponent(req.project.id)}`,
+  body: (req) => req,
+});
+
+// --- updateSession --------------------------------------------------------
+
+export const updateSessionRequestSchema = z.object({
+  session: sessionSchema,
+  update_masks: z.array(z.string()),
+});
+export type UpdateSessionRequest = z.input<typeof updateSessionRequestSchema>;
+export const updateSessionResponseSchema = sessionSchema;
+export type UpdateSessionResponse = z.infer<typeof updateSessionResponseSchema>;
+
+export const updateSession = defineRpc({
+  service: "agent",
+  name: "updateSession",
+  method: "PATCH",
+  requestSchema: updateSessionRequestSchema,
+  responseSchema: updateSessionResponseSchema,
+  path: (req) => `/sessions/${encodeURIComponent(req.session.id)}`,
+  body: (req) => req,
+});
+
+// --- clearSession ---------------------------------------------------------
+
+export const clearSessionRequestSchema = z.object({
+  session_id: z.string(),
+});
+export type ClearSessionRequest = z.input<typeof clearSessionRequestSchema>;
+export const clearSessionResponseSchema = z.object({});
+export type ClearSessionResponse = z.infer<typeof clearSessionResponseSchema>;
+
+export const clearSession = defineRpc({
+  service: "agent",
+  name: "clearSession",
+  method: "POST",
+  requestSchema: clearSessionRequestSchema,
+  responseSchema: clearSessionResponseSchema,
+  path: (req) => `/sessions/${encodeURIComponent(req.session_id)}/clear`,
+});
 
 export function configChanges(before: AgentConfig, after: AgentConfig) {
   return (Object.keys(after) as (keyof AgentConfig)[])

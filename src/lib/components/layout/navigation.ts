@@ -8,7 +8,6 @@ import {
   Folder,
   type LucideIcon,
   Monitor,
-  Package,
   Palette,
   Puzzle,
   ServerOff,
@@ -34,7 +33,6 @@ export const navGroups: { title: string; items: NavItem[] }[] = [
       { label: "Dashboard", href: "/", icon: Aperture },
       { label: "Projects", href: "/projects", icon: Folder },
       { label: "Skills", href: "/skills", icon: Puzzle },
-      { label: "Apps", href: "/apps", icon: Package },
     ],
   },
   {

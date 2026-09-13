@@ -4,12 +4,12 @@ import { Toaster } from "svelte-sonner";
 import AppHeader from "./lib/components/layout/AppHeader.svelte";
 import AppSidebar from "./lib/components/layout/AppSidebar.svelte";
 import { navGroups } from "./lib/components/layout/navigation";
-import Apps from "./lib/features/apps/Apps.svelte";
 import Authentication from "./lib/features/auth/Authentication.svelte";
 import Dashboard from "./lib/features/dashboard/Dashboard.svelte";
 import ErrorPages from "./lib/features/errors/ErrorPages.svelte";
 import Settings from "./lib/features/settings/Settings.svelte";
 import Projects from "./lib/service/agent/projects.svelte";
+import SkillDetail from "./lib/service/registry/skill-detail.svelte";
 import Skills from "./lib/service/registry/skills.svelte";
 
 let path = $state(
@@ -81,15 +81,17 @@ const current = $derived(
       .find((item) => item.href === path)?.label ??
     (path.startsWith("/projects")
       ? "Projects"
-      : path.startsWith("/settings")
-        ? "Settings"
-        : path.startsWith("/errors")
-          ? "Error pages"
-          : path.startsWith("/clerk")
-            ? "Secured by Clerk"
-            : authPaths.includes(path)
-              ? "Authentication"
-              : "Not found"),
+      : path.startsWith("/skills")
+        ? "Skills"
+        : path.startsWith("/settings")
+          ? "Settings"
+          : path.startsWith("/errors")
+            ? "Error pages"
+            : path.startsWith("/clerk")
+              ? "Secured by Clerk"
+              : authPaths.includes(path)
+                ? "Authentication"
+                : "Not found"),
 );
 
 const navigate = (href: string) => {
@@ -160,9 +162,11 @@ const onPopState = () => {
                   <Projects {path} onNavigate={navigate} />
                 {/key}
               {:else if path === "/skills"}
-                <Skills />
-              {:else if path === "/apps"}
-                <Apps />
+                <Skills onNavigate={navigate} />
+              {:else if path.startsWith("/skills/")}
+                {#key path}
+                  <SkillDetail {path} onNavigate={navigate} />
+                {/key}
               {:else if path.startsWith("/settings")}
                 <Settings
                   {path}

@@ -277,7 +277,9 @@ const submit = () => {
   <div class="mx-auto max-w-5xl px-4 py-12">
     <div class="mb-8 text-center">
       {@render brand()}
-      <h1 class="text-2xl font-bold tracking-tight">Authentication</h1>
+      <h1 class="text-2xl font-bold uppercase tracking-tight">
+        Authentication
+      </h1>
       <p class="mt-2 text-sm text-muted-foreground">
         Preview the authentication flows included in the admin dashboard.
       </p>

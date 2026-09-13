@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Save } from "@lucide/svelte";
+import { LoaderCircle, Save } from "@lucide/svelte";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import FieldArray from "../field-array.svelte";
@@ -111,9 +111,21 @@ async function save(event: SubmitEvent) {
           {error}
         </p>
       {/if}
-      <Button type="submit" disabled={saving}
-        ><Save size={16} />{saving ? "Saving…" : "Save changes"}</Button
+      <Button
+        type="submit"
+        variant="ghost"
+        size="icon"
+        class="border-border bg-background"
+        disabled={saving}
+        title="Save changes"
+        aria-label="Save changes"
       >
+        {#if saving}
+          <LoaderCircle size={16} class="animate-spin" />
+        {:else}
+          <Save size={16} />
+        {/if}
+      </Button>
     </div>
   {/if}
 </form>

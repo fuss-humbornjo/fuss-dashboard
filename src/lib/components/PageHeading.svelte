@@ -3,12 +3,12 @@ import { Plus } from "@lucide/svelte";
 
 let {
   title,
-  description,
+  description = "",
   action = "",
   onAction = () => {},
 }: {
   title: string;
-  description: string;
+  description?: string;
   action?: string;
   onAction?: () => void;
 } = $props();
@@ -16,8 +16,14 @@ let {
 
 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
   <div>
-    <h1 class="text-2xl font-bold tracking-tight md:text-3xl">{title}</h1>
-    <p class="mt-1.5 font-mono text-xs text-muted-foreground">{description}</p>
+    <h1 class="text-2xl font-bold uppercase tracking-tight md:text-3xl">
+      {title}
+    </h1>
+    {#if description}
+      <p class="mt-1.5 font-mono text-xs text-muted-foreground">
+        {description}
+      </p>
+    {/if}
   </div>
   {#if action}
     <button

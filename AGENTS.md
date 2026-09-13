@@ -18,6 +18,8 @@ Working agreements for agentic work in this repo.
 
 Supporting directories:
 
+- `assets/` — static assets (logos, error illustrations) imported through
+  Vite as `$lib/assets/...`; the single-file build inlines them as data URIs.
 - `components/layout/` — the app shell: sidebar, header, page heading, user
   menu, and the nav config (`navigation.ts`). Kebab-case filenames.
 - `components/ui/` — vendored shadcn-svelte primitives, one directory per

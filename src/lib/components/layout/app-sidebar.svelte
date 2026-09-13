@@ -1,5 +1,7 @@
 <script lang="ts">
 import { ChevronRight, ChevronsUpDown, PanelLeft } from "@lucide/svelte";
+import fussSvg from "$lib/assets/fuss.svg";
+import fussDarkSvg from "$lib/assets/fuss-dark.svg";
 import { Separator } from "../ui/separator";
 import { type NavItem, navGroups } from "./navigation";
 import UserMenu from "./user-menu.svelte";
@@ -68,12 +70,12 @@ const activate = (item: NavItem) => {
         class="grid size-8 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground"
       >
         <img
-          src="/fuss.svg"
+          src={fussSvg}
           alt=""
           class="size-8 rounded-lg object-cover dark:hidden"
         >
         <img
-          src="/fuss-dark.svg"
+          src={fussDarkSvg}
           alt=""
           class="hidden size-8 rounded-lg object-cover dark:block"
         >

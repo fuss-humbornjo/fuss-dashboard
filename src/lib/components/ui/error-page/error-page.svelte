@@ -21,6 +21,14 @@ const code = $derived.by(() => {
   return "500";
 });
 
+// Imported through Vite so the single-file build inlines the illustrations
+// as data URIs instead of referencing publicDir paths.
+const illustrations = import.meta.glob<string>("$lib/assets/errors/*.png", {
+  eager: true,
+  import: "default",
+});
+const illustration = $derived(illustrations[`$lib/assets/errors/${code}.png`]);
+
 let canvas = $state<HTMLCanvasElement>();
 let stage = $state<HTMLDivElement>();
 let webglFailed = $state(false);
@@ -47,7 +55,7 @@ onMount(() => {
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
   camera.position.z = 2;
   const geometry = new THREE.PlaneGeometry(2.15, 1.22);
-  const texture = new THREE.TextureLoader().load(`/errors/${code}.png`);
+  const texture = new THREE.TextureLoader().load(illustration);
   texture.colorSpace = THREE.SRGBColorSpace;
   const mesh = new THREE.Mesh(
     geometry,
@@ -100,7 +108,7 @@ onMount(() => {
     >
       {#if webglFailed}
         <img
-          src={`/errors/${code}.png`}
+          src={illustration}
           alt={`Illustration for error ${code}`}
           class="max-h-full max-w-full object-contain"
         >

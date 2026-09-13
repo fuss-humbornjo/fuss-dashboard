@@ -2,6 +2,7 @@ import { fileURLToPath } from "node:url";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, loadEnv } from "vite";
+import { viteSingleFile } from "vite-plugin-singlefile";
 
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 
@@ -22,7 +23,6 @@ export default defineConfig(({ mode }) => {
   return {
     server: { host: "127.0.0.1", proxy },
     preview: { host: "127.0.0.1", proxy },
-    publicDir: "static",
     resolve: {
       alias: {
         "$app/environment": `${projectRoot}/src/lib/shims/app-environment.ts`,
@@ -30,6 +30,6 @@ export default defineConfig(({ mode }) => {
         $lib: `${projectRoot}/src/lib`,
       },
     },
-    plugins: [svelte(), tailwindcss()],
+    plugins: [svelte(), tailwindcss(), viteSingleFile()],
   };
 });

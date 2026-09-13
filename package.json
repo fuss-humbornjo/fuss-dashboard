@@ -30,7 +30,8 @@
     "tailwind-variants": "^3.3.1",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "vite-plugin-singlefile": "^2.3.3"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",

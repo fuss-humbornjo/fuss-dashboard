@@ -8,6 +8,7 @@
 
 import { queryOptions } from "@tanstack/svelte-query";
 import type { z } from "zod";
+import { authHeaders } from "../auth";
 
 export class ApiError extends Error {
   constructor(
@@ -63,7 +64,7 @@ function serverReason(text: string): string | undefined {
 }
 
 interface RpcOptions<Req extends z.ZodType, Res extends z.ZodType> {
-  /** Service name: the /api/<service> prefix and the query key's head. */
+  /** Service name: the /<service> path prefix and the query key's head. */
   service: "agent" | "registry";
   /** RPC name, e.g. "getSkill" — the query key's second segment. */
   name: string;
@@ -96,12 +97,15 @@ export function defineRpc<Req extends z.ZodType, Res extends z.ZodType>(
     const req = requestSchema.parse(request);
     const body = encode?.(req);
     const form = body instanceof FormData;
-    const response = await fetch(`/api/${service}${path(req)}`, {
+    const response = await fetch(`/${service}${path(req)}`, {
       method,
-      headers:
-        body === undefined || form
-          ? undefined // the browser sets the multipart boundary itself
-          : { "Content-Type": "application/json" },
+      headers: {
+        ...authHeaders(),
+        // with FormData the browser sets the multipart boundary itself
+        ...(body === undefined || form
+          ? {}
+          : { "Content-Type": "application/json" }),
+      },
       body:
         body === undefined
           ? undefined

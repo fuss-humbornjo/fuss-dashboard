@@ -1,6 +1,7 @@
 <script lang="ts">
 import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
 import { Toaster } from "svelte-sonner";
+import { stripBase, withBase } from "./lib/base";
 import AppHeader from "./lib/components/layout/app-header.svelte";
 import AppSidebar from "./lib/components/layout/app-sidebar.svelte";
 import { navGroups } from "./lib/components/layout/navigation";
@@ -12,7 +13,7 @@ import SkillDetail from "./lib/service/registry/skill-detail.svelte";
 import Skills from "./lib/service/registry/skills.svelte";
 
 let path = $state(
-  typeof window === "undefined" ? "/" : window.location.pathname,
+  typeof window === "undefined" ? "/" : stripBase(window.location.pathname),
 );
 type LayoutMode = "default" | "compact" | "full";
 type SidebarCollapseMode = "icon" | "offcanvas";
@@ -75,13 +76,14 @@ const current = $derived(
 const navigate = (href: string) => {
   path = href;
   mobileSidebarOpen = false;
-  if (typeof window !== "undefined") window.history.pushState({}, "", href);
+  if (typeof window !== "undefined")
+    window.history.pushState({}, "", withBase(href));
 };
 const toggleSidebar = () => {
   sidebarExpanded = !sidebarExpanded;
 };
 const onPopState = () => {
-  path = window.location.pathname;
+  path = stripBase(window.location.pathname);
 };
 </script>
 

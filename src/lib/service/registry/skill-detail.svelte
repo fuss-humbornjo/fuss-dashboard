@@ -14,6 +14,7 @@ import {
 import { createQuery, useQueryClient } from "@tanstack/svelte-query";
 import { untrack } from "svelte";
 import { toast } from "svelte-sonner";
+import { authHeaders } from "../../auth";
 import {
   type Breadcrumb,
   featureCrumbs,
@@ -177,7 +178,30 @@ const removeSkill = async () => {
 };
 
 const downloadHref = (pkg: SkillPackage) =>
-  `/api/registry/scopes/${encodeURIComponent(scope)}/skills/${encodeURIComponent(name)}/versions/${encodeURIComponent(pkg.version)}/package`;
+  `/registry/scopes/${encodeURIComponent(scope)}/skills/${encodeURIComponent(name)}/versions/${encodeURIComponent(pkg.version)}/package`;
+
+let downloadingVersion = $state<string | null>(null);
+
+// Anchors can't carry the bearer header — fetch the tarball, then save it
+// through a temporary object URL.
+const downloadPackage = async (pkg: SkillPackage) => {
+  if (downloadingVersion !== null) return;
+  downloadingVersion = pkg.version;
+  try {
+    const res = await fetch(downloadHref(pkg), { headers: authHeaders() });
+    if (!res.ok) throw new Error(`Download failed (${res.status})`);
+    const url = URL.createObjectURL(await res.blob());
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${name}-${pkg.version}.tar.gz`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  } catch (cause) {
+    toast.error(cause instanceof Error ? cause.message : "Download failed");
+  } finally {
+    downloadingVersion = null;
+  }
+};
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString(undefined, {
@@ -475,14 +499,19 @@ const formatSize = (bytes: number) =>
                 >
                   <ArrowUpToLine size={13} />
                 </button>
-                <a
-                  href={downloadHref(pkg)}
-                  download
-                  class="rounded-md p-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                <button
+                  type="button"
+                  class="rounded-md p-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
                   aria-label={`Download package ${pkg.version}`}
+                  disabled={downloadingVersion !== null}
+                  onclick={() => downloadPackage(pkg)}
                 >
-                  <Download size={13} />
-                </a>
+                  {#if downloadingVersion === pkg.version}
+                    <LoaderCircle size={13} class="animate-spin" />
+                  {:else}
+                    <Download size={13} />
+                  {/if}
+                </button>
                 <button
                   type="button"
                   class="rounded-md p-1.5 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive disabled:pointer-events-none disabled:opacity-50"

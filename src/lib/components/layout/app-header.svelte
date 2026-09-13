@@ -1,5 +1,6 @@
 <script lang="ts">
 import { Aperture, Moon, PanelLeft, Search, Sun } from "@lucide/svelte";
+import { withBase } from "../../base";
 import * as Breadcrumb from "../ui/breadcrumb/index.js";
 import { Button } from "../ui/button/index.js";
 import { type Breadcrumb as Crumb, featureCrumbs } from "./breadcrumbs.svelte";
@@ -110,7 +111,7 @@ const go = (href: string) => {
           {:else if crumb.href}
             {@const href = crumb.href}
             <Breadcrumb.Link
-              {href}
+              href={withBase(href)}
               class="block max-w-40 truncate"
               onclick={(event: MouseEvent) => {
                 if (

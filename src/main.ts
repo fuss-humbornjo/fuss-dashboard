@@ -1,6 +1,9 @@
 import { mount } from "svelte";
 import "./app.css";
 import App from "./App.svelte";
+import { bootstrapToken } from "./lib/auth";
+
+bootstrapToken();
 
 const target = document.getElementById("app");
 

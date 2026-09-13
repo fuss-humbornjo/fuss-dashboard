@@ -3,6 +3,7 @@ import { FileCode, LoaderCircle, X } from "@lucide/svelte";
 import { createQuery } from "@tanstack/svelte-query";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
+import { authHeaders } from "../../auth";
 import type { SkillPackage } from "./api";
 import FileTree from "./file-tree.svelte";
 import { extractSkillTarball, readEntryText } from "./tar";
@@ -42,7 +43,8 @@ const filesQuery = createQuery(() => ({
   staleTime: Number.POSITIVE_INFINITY,
   queryFn: async () => {
     const res = await fetch(
-      `/api/registry/scopes/${encodeURIComponent(scope)}/skills/${encodeURIComponent(name)}/versions/${encodeURIComponent(pkg.version)}/package`,
+      `/registry/scopes/${encodeURIComponent(scope)}/skills/${encodeURIComponent(name)}/versions/${encodeURIComponent(pkg.version)}/package`,
+      { headers: authHeaders() },
     );
     if (!res.ok) throw new Error(`download failed (${res.status})`);
     return extractSkillTarball(await res.blob());

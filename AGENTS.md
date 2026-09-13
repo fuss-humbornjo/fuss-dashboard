@@ -31,6 +31,15 @@ Supporting directories:
   Excluded from Biome (`biome.json`); patch minimally and in place.
 - `shims/` — shims for SvelteKit-only imports that vendored code expects
   (e.g. `$app/environment`).
+- `base.ts` — URL base helpers for the embedded mount: production builds
+  use `base: "/ui/"` (served by fuss at `/ui`), while `pnpm dev` serves at
+  the root. The router strips the base (`stripBase`); real `<a>` hrefs
+  prefix it (`withBase`) so open-in-new-tab works. Paths handed to
+  `onNavigate` stay base-less.
+- `auth.ts` — API bearer auth for the embedded build: `?token=` bootstrap
+  into `localStorage` (`fuss.token`) plus `authHeaders()`; every fetch to
+  `/agent` or `/registry` must spread `authHeaders()` (anchors can't set
+  headers — download via fetch → blob → object URL).
 - `utils.ts` — `cn()` and the bits-ui prop helper types; import as
   `$lib/utils.js`.
 

@@ -23,6 +23,7 @@ import {
   createQuery,
   useQueryClient,
 } from "@tanstack/svelte-query";
+import { withBase } from "../../base";
 import {
   type Breadcrumb,
   featureCrumbs,
@@ -599,7 +600,7 @@ async function saveProject(name: string, config: AgentConfig): Promise<void> {
               </span>
               <a
                 class="group min-w-0 flex-1"
-                {href}
+                href={withBase(href)}
                 onclick={(event) => { if (!event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0) { event.preventDefault(); onNavigate(href); } }}
               >
                 <p class="truncate text-sm font-medium group-hover:underline">

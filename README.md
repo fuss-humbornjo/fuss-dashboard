@@ -1,6 +1,9 @@
-# Shadcn Admin Dashboard
+# fuss dashboard
 
-A responsive admin dashboard UI recreated from [satnaing/shadcn-admin](https://github.com/satnaing/shadcn-admin), rewritten in Svelte while preserving the reference project's navigation, dashboard composition, data views, settings, authentication, and error-page surfaces.
+A responsive admin dashboard for the [fuss](../fuss) backend, built with Svelte 5.
+It started as a Svelte recreation of [satnaing/shadcn-admin](https://github.com/satnaing/shadcn-admin)
+and keeps that project's shell (sidebar, header, dashboard composition), while the
+feature surfaces talk to fuss backend services.
 
 ## Stack
 
@@ -8,23 +11,34 @@ A responsive admin dashboard UI recreated from [satnaing/shadcn-admin](https://g
 - **Vite** — development server and production bundling.
 - **Svelte 5 + TypeScript** — component UI with runes and strict type checking.
 - **Tailwind CSS 4** — utility-first styling with shadcn-style semantic design tokens.
-- **shadcn-svelte components** — downloaded local primitives for Select, Calendar, Popover, Checkbox, and Button, then adapted to the reference dashboard’s Svelte markup and visual geometry.
-- **TanStack Table** — headless task and user data tables through `@tanstack/svelte-table`.
+- **shadcn-svelte / bits-ui** — vendored local primitives (`src/lib/components/ui/`) providing keyboard behavior, focus management, portals, and accessible ARIA state.
+- **TanStack Query** — server-state fetching and caching through `@tanstack/svelte-query`.
+- **Edra (tiptap)** — vendored rich-text editor (`src/lib/edra/`) used for markdown prompt editing.
+- **THREE.js** — animated error-page illustrations.
 - **Lucide** — interface icons through `@lucide/svelte`.
 - **Biome** — the single formatter and linter.
 
-The UI uses shadcn-svelte’s headless component layer rather than replacing source
-controls with native-only equivalents. Feature components own the source-faithful
-layout and styling, while the generated local primitives provide keyboard behavior,
-focus management, portals, and accessible ARIA state.
-
 ## Included surfaces
 
-- Responsive sidebar with grouped navigation and mobile drawer behavior.
-- Header search affordance, notifications affordance, breadcrumb, and light/dark theme toggle.
-- Dashboard overview cards, revenue chart, recent sales, and activity feed.
-- Filterable Tasks and Users tables powered by TanStack Table.
-- Apps catalog, Chats inbox, Settings sections, Authentication previews, and Error pages.
+- Responsive sidebar with grouped navigation, collapsible icon rail, and mobile drawer.
+- Header with breadcrumbs, search affordance, and light/dark theme toggle.
+- Dashboard overview cards, revenue chart, recent sales, and activity feed (fixture data).
+- **Projects** — fuss agent service: project/session browsing plus agent config editing, with markdown `system_prompt` / `hint_prompt` editing via Edra.
+- **Skills** — fuss registry service: skill browsing, detail views, preview, and `.tar` upload.
+- Authentication page previews (sign-in, sign-up, forgot password, OTP, Clerk variants).
+- Inline error pages (`ErrorPage` component) with THREE.js canvas illustrations; unknown routes fall through to a 404.
+
+## Backend connection
+
+The dashboard calls the fuss backend through Vite dev/preview proxies:
+
+- `/api/agent` → agent service
+- `/api/registry` → registry service
+
+Both proxy to `FUSS_API_URL` (default `http://localhost:8080`) with the `/api`
+prefix stripped. Set `AGENT_SERVICE_TOKEN` to attach a `Bearer` token to
+proxied requests. The dashboard and auth surfaces work without a backend;
+projects and skills need one running.
 
 ## Commands
 
@@ -39,4 +53,4 @@ pnpm format:check # verify formatting without changing files
 pnpm quality      # check + Biome check
 ```
 
-The UI is currently fixture-backed so the reference dashboard can be explored without a backend. Routes are handled client-side for the included dashboard surfaces.
+Routes are handled client-side in `src/App.svelte`.

@@ -417,7 +417,7 @@ async function saveProject(name: string, config: AgentConfig): Promise<void> {
       message={message(queryError)}
       onRetry={retry}
     />
-  {:else if pending && !projects.length && !sessions.length && !session && !project}
+  {:else if pending && (sessionId || settings)}
     <div
       role="status"
       class="flex min-h-48 items-center justify-center gap-2 text-sm text-muted-foreground"
@@ -595,6 +595,13 @@ async function saveProject(name: string, config: AgentConfig): Promise<void> {
           message={message(queryError)}
           onRetry={retry}
         />
+      {:else if pending}
+        <div
+          role="status"
+          class="flex min-h-48 items-center justify-center gap-2 text-sm text-muted-foreground"
+        >
+          <LoaderCircle class="animate-spin" size={18} />Loading…
+        </div>
       {:else}
         <div class="border bg-card">
           <div class="divide-y">

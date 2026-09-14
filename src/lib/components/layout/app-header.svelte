@@ -1,5 +1,6 @@
 <script lang="ts">
 import { Aperture, Moon, PanelLeft, Search, Sun } from "@lucide/svelte";
+import { fade } from "svelte/transition";
 import { withBase } from "../../base";
 import * as Breadcrumb from "../ui/breadcrumb/index.js";
 import { Button } from "../ui/button/index.js";
@@ -171,10 +172,13 @@ const go = (href: string) => {
 </header>
 
 {#if searchOpen}
-  <div class="fixed inset-0 z-50 flex justify-center p-4 pt-[15vh]">
+  <div
+    class="fixed inset-0 z-50 flex justify-center p-4 pt-[15vh]"
+    transition:fade={{ duration: 150 }}
+  >
     <button
       type="button"
-      class="absolute inset-0 -z-10 bg-slate-950/45"
+      class="absolute inset-0 -z-10 bg-black/50"
       aria-label="Close search"
       onclick={closeSearch}
     ></button>

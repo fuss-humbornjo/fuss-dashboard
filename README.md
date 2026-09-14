@@ -1,9 +1,6 @@
 # fuss dashboard
 
-A responsive admin dashboard for the [fuss](../fuss) backend, built with Svelte 5.
-It started as a Svelte recreation of [satnaing/shadcn-admin](https://github.com/satnaing/shadcn-admin)
-and keeps that project's shell (sidebar, header, dashboard composition), while the
-feature surfaces talk to fuss backend services.
+A responsive admin dashboard for the [fuss](https://github.com/fuss-humbornjo/fuss) backend, built with Svelte 5. It started as a Svelte recreation of [satnaing/shadcn-admin](https://github.com/satnaing/shadcn-admin) and keeps that project's shell (sidebar, header, dashboard composition), while the feature surfaces talk to fuss backend services.
 
 ## Stack
 
@@ -30,27 +27,13 @@ feature surfaces talk to fuss backend services.
 
 ## Backend connection
 
-The dashboard calls the fuss backend at its root-mounted routes (`/agent`,
-`/registry`). In dev, Vite proxies those paths to `FUSS_API_URL` (default
-`http://localhost:8080`); set `AGENT_SERVICE_TOKEN` to attach a `Bearer`
-token to proxied requests. The dashboard and auth surfaces work without a
-backend; projects and skills need one running.
+The dashboard calls the fuss backend at its root-mounted routes (`/agent`, `/registry`). In dev, Vite proxies those paths to `FUSS_API_URL` (default `http://localhost:8080`); set `AGENT_SERVICE_TOKEN` to attach a `Bearer` token to proxied requests. The dashboard and auth surfaces work without a backend; projects and skills need one running.
 
 ## Embedded in fuss
 
-This repo is a git submodule of [fuss](../fuss) at `web/`. With `FUSS_WEB`
-set, fuss's `make build` / `make run` build the dashboard
-(`pnpm --dir web build`) and compile it in (`-tags web`): `main_web.go`
-embeds the single-file `dist/index.html` and serves every GET under `/ui`.
-The production build uses `base: "/ui/"`; `pnpm dev` keeps serving at the
-root (`http://127.0.0.1:5173/`) for local development — the router and
-anchors derive the base from `import.meta.env.BASE_URL` (see
-`src/lib/base.ts`), so both work unchanged.
+This repo is a git submodule of [fuss](https://github.com/fuss-humbornjo/fuss) at `web/`. With `FUSS_WEB` set, fuss's `make build` / `make run` build the dashboard (`pnpm --dir web build`) and compile it in (`-tags web`): `main_web.go` embeds the single-file `dist/index.html` and serves every GET under `/ui`. The production build uses `base: "/ui/"`; `pnpm dev` keeps serving at the root (`http://127.0.0.1:5173/`) for local development — the router and anchors derive the base from `import.meta.env.BASE_URL` (see `src/lib/base.ts`), so both work unchanged.
 
-fuss protects its API with a bearer token, and the embedded build has no
-proxy to inject one — open `/ui/?token=$AGENT_SERVICE_TOKEN` once. The
-token is stored in `localStorage` (`fuss.token`), stripped from the URL,
-and sent as a `Bearer` header on every API call (see `src/lib/auth.ts`).
+fuss protects its API with a bearer token, and the embedded build has no proxy to inject one — open `/ui/?token=$AGENT_SERVICE_TOKEN` once. The token is stored in `localStorage` (`fuss.token`), stripped from the URL, and sent as a `Bearer` header on every API call (see `src/lib/auth.ts`).
 
 ## Commands
 
@@ -69,9 +52,4 @@ Routes are handled client-side in `src/App.svelte`.
 
 ## Acknowledgments
 
-The error page illustrations (`src/lib/assets/errors/`) are by
-[さわらつき (SAWARATSUKI)](https://github.com/SAWARATSUKI), from the
-[KawaiiLogos](https://github.com/SAWARATSUKI/KawaiiLogos) series. They are
-not covered by this repository's MIT license; the KawaiiLogos terms apply
-instead: free for personal use, with commercial use requiring the rights
-holder's permission.
+The error page illustrations (`src/lib/assets/errors/`) are by [さわらつき (SAWARATSUKI)](https://github.com/SAWARATSUKI), from the [KawaiiLogos](https://github.com/SAWARATSUKI/KawaiiLogos) series. They are not covered by this repository's MIT license; the KawaiiLogos terms apply instead: free for personal use, with commercial use requiring the rights holder's permission.

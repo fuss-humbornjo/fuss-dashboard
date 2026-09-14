@@ -31,9 +31,9 @@ The dashboard calls the fuss backend at its root-mounted routes (`/agent`, `/reg
 
 ## Embedded in fuss
 
-This repo is a git submodule of [fuss](https://github.com/fuss-humbornjo/fuss) at `web/`. With `FUSS_WEB` set, fuss's `make build` / `make run` build the dashboard (`pnpm --dir web build`) and compile it in (`-tags web`): `main_web.go` embeds the single-file `dist/index.html` and serves every GET under `/ui`. The production build uses `base: "/ui/"`; `pnpm dev` keeps serving at the root (`http://127.0.0.1:5173/`) for local development — the router and anchors derive the base from `import.meta.env.BASE_URL` (see `src/lib/base.ts`), so both work unchanged.
+This repo is a git submodule of [fuss](https://github.com/fuss-humbornjo/fuss) at `web/`. With `FUSS_WEB` set, fuss's `make build` / `make run` build the dashboard (`pnpm --dir web build`) and compile it in (`-tags web`): `main_web.go` embeds the single-file `dist/index.html` and serves every GET under `/ui`. The production build uses `base: "/ui/"`; `pnpm dev` keeps serving at the root (`http://127.0.0.1:5173/`) for local development. The router and anchors derive the base from `import.meta.env.BASE_URL` (see `src/lib/base.ts`), so both work unchanged.
 
-fuss protects its API with a bearer token, and the embedded build has no proxy to inject one — open `/ui/?token=$AGENT_SERVICE_TOKEN` once. The token is stored in `localStorage` (`fuss.token`), stripped from the URL, and sent as a `Bearer` header on every API call (see `src/lib/auth.ts`).
+fuss protects its API with a bearer token, and the embedded build has no proxy to inject one. Open `/ui/?token=$AGENT_SERVICE_TOKEN` once. The token is stored in `localStorage` (`fuss.token`), stripped from the URL, and sent as a `Bearer` header on every API call (see `src/lib/auth.ts`).
 
 ## Commands
 

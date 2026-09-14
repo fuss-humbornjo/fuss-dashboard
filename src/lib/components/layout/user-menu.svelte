@@ -19,6 +19,7 @@ let position = $state("");
 
 const toggle = () => {
   open = !open;
+  if (open) place();
 };
 const close = () => {
   open = false;
@@ -51,13 +52,9 @@ const place = () => {
   position = `${horizontal}; ${vertical}`;
 };
 
-$effect(() => {
-  if (open) place();
-});
-
 function portal(node: HTMLElement) {
   document.body.appendChild(node);
-  return { destroy: () => node.remove() };
+  return () => node.remove();
 }
 </script>
 
@@ -74,7 +71,7 @@ function portal(node: HTMLElement) {
 </div>
 {#if open}
   <div
-    use:portal
+    {@attach portal}
     bind:this={menuEl}
     class="fixed z-50 w-56 rounded-md border bg-popover p-1 shadow-lg"
     style={position}

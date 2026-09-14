@@ -56,8 +56,7 @@ const activate = (item: NavItem) => {
 {/if}
 
 <aside
-  class:translate-x-0={open}
-  class={`fixed inset-y-0 left-0 z-40 flex h-svh min-h-0 min-w-0 w-64 shrink-0 -translate-x-full flex-col overflow-x-hidden border-r bg-sidebar transition-[width,transform] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] lg:static lg:translate-x-0 lg:p-2 ${offcanvas ? "lg:w-0 lg:overflow-hidden" : collapsed ? "lg:w-16" : "lg:w-64"}`}
+  class={`fixed inset-y-0 left-0 z-40 flex h-svh min-h-0 min-w-0 w-64 shrink-0 -translate-x-full flex-col overflow-x-hidden border-r bg-sidebar transition-[width,transform] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] lg:static lg:translate-x-0 lg:p-2 ${open ? "translate-x-0" : ""} ${offcanvas ? "lg:w-0 lg:overflow-hidden" : collapsed ? "lg:w-16" : "lg:w-64"}`}
 >
   <div class="h-16 shrink-0 p-2">
     <button

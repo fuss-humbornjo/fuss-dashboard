@@ -26,6 +26,8 @@ if (editor) {
       emitUpdate: false,
     });
   }
+  // Editability is set once at creation; the keyed form remount recreates
+  // the editor when the resource snapshot changes.
   editor.setEditable(!readonly);
 }
 
@@ -48,8 +50,7 @@ function fadeScrollbar() {
       <Edra.BubbleMenu />
     {/if}
     <div
-      class="content-scroll max-h-80 overflow-y-auto"
-      class:scrolling
+      class={`content-scroll max-h-80 overflow-y-auto ${scrolling ? "scrolling" : ""}`}
       onscroll={fadeScrollbar}
     >
       <Edra.Content class={`px-3 py-2 text-sm ${contentClass}`} />

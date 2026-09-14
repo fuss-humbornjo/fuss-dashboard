@@ -26,11 +26,9 @@ let mobileSidebarOpen = $state(false);
 let sidebarExpanded = $state(true);
 let sidebarCollapseMode = $state<SidebarCollapseMode>("icon");
 let dark = $state(true);
-// Theme tokens and the tailwind dark: variant are scoped to .dark — put it on
-// the root element so portaled overlays (popover/select/dialog) inherit them.
-$effect(() => {
-  document.documentElement.classList.toggle("dark", dark);
-});
+// Theme tokens and the tailwind dark: variant are scoped to .dark — it lives
+// on the root element (set statically in index.html) so portaled overlays
+// (popover/select/dialog) inherit it; the toggle handler flips it.
 const authPaths = [
   "/sign-in",
   "/sign-in-2",
@@ -82,6 +80,10 @@ const navigate = (href: string) => {
 const toggleSidebar = () => {
   sidebarExpanded = !sidebarExpanded;
 };
+const toggleTheme = () => {
+  dark = !dark;
+  document.documentElement.classList.toggle("dark", dark);
+};
 const onPopState = () => {
   path = stripBase(window.location.pathname);
 };
@@ -119,7 +121,7 @@ const onPopState = () => {
             {path}
             {dark}
             onOpen={() => (mobileSidebarOpen = true)}
-            onToggleTheme={() => (dark = !dark)}
+            onToggleTheme={toggleTheme}
             onNavigate={navigate}
           />
           <main

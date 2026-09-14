@@ -26,6 +26,7 @@ dist-ssr
 *.sw?
 
 .agents/
+.claude/
 
 # Design references (local only)
 design/

@@ -30,8 +30,10 @@ import {
 } from "../../components/layout/breadcrumbs.svelte";
 import { Button } from "../../components/ui/button";
 import { CloakedText, cloak } from "../../components/ui/cloaked-text";
+import { ErrorPage } from "../../components/ui/error-page";
 import { Input } from "../../components/ui/input";
 import ConfigForm from "../../package/agent/config-form.svelte";
+import { errorStatus } from "../rpc";
 import {
   type AgentConfig,
   configChanges,
@@ -361,19 +363,14 @@ async function saveProject(name: string, config: AgentConfig): Promise<void> {
     </div>
   </div>
 
-  {#if queryError || createProjectMutation.error || createSessionMutation.error}
+  {#if createProjectMutation.error || createSessionMutation.error}
     <div
       role="alert"
       class="flex flex-wrap items-center gap-3 border-l-2 border-destructive pl-4 text-sm text-destructive"
     >
       <p>
-        {message(queryError ?? createProjectMutation.error ?? createSessionMutation.error)}
+        {message(createProjectMutation.error ?? createSessionMutation.error)}
       </p>
-      {#if queryError}
-        <Button variant="outline" disabled={pending} onclick={retry}
-          >Retry</Button
-        >
-      {/if}
     </div>
   {/if}
   {#if notice}
@@ -413,6 +410,13 @@ async function saveProject(name: string, config: AgentConfig): Promise<void> {
           : "Create project"}</Button
       >
     </form>
+  {:else if queryError && (sessionId || settings)}
+    <ErrorPage
+      compact
+      errcode={errorStatus(queryError)}
+      message={message(queryError)}
+      onRetry={retry}
+    />
   {:else if pending && !projects.length && !sessions.length && !session && !project}
     <div
       role="status"
@@ -584,73 +588,84 @@ async function saveProject(name: string, config: AgentConfig): Promise<void> {
           {/if}
         </div>
       </div>
-      <div class="border bg-card">
-        <div class="divide-y">
-          {#each shownItems as item (item.id)}
-            {@const href = projectId ? `${projectPath}/sessions/${encodeURIComponent(item.id)}` : `/projects/${encodeURIComponent(item.id)}`}
-            {@const RowIcon = projectId ? MessagesSquare : Folder}
-            {@const label = item.name || cloakName(item.id)}
-            <div
-              class="flex items-center gap-4 p-4 transition hover:bg-muted/40"
-            >
-              <span
-                class="grid size-9 shrink-0 place-items-center rounded-md border border-dashed border-foreground/20 text-muted-foreground"
+      {#if queryError}
+        <ErrorPage
+          compact
+          errcode={errorStatus(queryError)}
+          message={message(queryError)}
+          onRetry={retry}
+        />
+      {:else}
+        <div class="border bg-card">
+          <div class="divide-y">
+            {#each shownItems as item (item.id)}
+              {@const href = projectId ? `${projectPath}/sessions/${encodeURIComponent(item.id)}` : `/projects/${encodeURIComponent(item.id)}`}
+              {@const RowIcon = projectId ? MessagesSquare : Folder}
+              {@const label = item.name || cloakName(item.id)}
+              <div
+                class="flex items-center gap-4 p-4 transition hover:bg-muted/40"
               >
-                <RowIcon size={15} />
-              </span>
-              <a
-                class="group min-w-0 flex-1"
-                href={withBase(href)}
-                onclick={(event) => { if (!event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0) { event.preventDefault(); onNavigate(href); } }}
-              >
-                <p class="truncate text-sm font-medium group-hover:underline">
-                  {#if item.name}
-                    {item.name}
-                  {:else}
-                    <CloakedText text={item.id} ellipsis={false} uppercase />
-                  {/if}
-                </p>
-                <p class="truncate font-mono text-[11px] text-muted-foreground">
-                  {item.id}
-                </p>
-              </a>
-              {#if "source" in item}
                 <span
-                  class="hidden shrink-0 rounded-md border border-foreground/15 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:block"
+                  class="grid size-9 shrink-0 place-items-center rounded-md border border-dashed border-foreground/20 text-muted-foreground"
                 >
-                  {item.source}
+                  <RowIcon size={15} />
                 </span>
-              {:else}
+                <a
+                  class="group min-w-0 flex-1"
+                  href={withBase(href)}
+                  onclick={(event) => { if (!event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0) { event.preventDefault(); onNavigate(href); } }}
+                >
+                  <p class="truncate text-sm font-medium group-hover:underline">
+                    {#if item.name}
+                      {item.name}
+                    {:else}
+                      <CloakedText text={item.id} ellipsis={false} uppercase />
+                    {/if}
+                  </p>
+                  <p
+                    class="truncate font-mono text-[11px] text-muted-foreground"
+                  >
+                    {item.id}
+                  </p>
+                </a>
+                {#if "source" in item}
+                  <span
+                    class="hidden shrink-0 rounded-md border border-foreground/15 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:block"
+                  >
+                    {item.source}
+                  </span>
+                {:else}
+                  <span
+                    class="hidden w-20 shrink-0 text-right font-mono text-[11px] text-muted-foreground sm:block"
+                    title={date(item.last_activity_at)}
+                  >
+                    {relative(item.last_activity_at)}
+                  </span>
+                {/if}
                 <span
-                  class="hidden w-20 shrink-0 text-right font-mono text-[11px] text-muted-foreground sm:block"
-                  title={date(item.last_activity_at)}
+                  class="hidden w-20 shrink-0 text-right font-mono text-[11px] text-muted-foreground md:block"
+                  title={date(item.updated_at)}
                 >
-                  {relative(item.last_activity_at)}
+                  {day(item.updated_at)}
                 </span>
-              {/if}
-              <span
-                class="hidden w-20 shrink-0 text-right font-mono text-[11px] text-muted-foreground md:block"
-                title={date(item.updated_at)}
-              >
-                {day(item.updated_at)}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                title={`Configure ${label}`}
-                aria-label={`Configure ${label}`}
-                onclick={() => onNavigate(`${href}/config`)}
-                ><SquarePen size={16} /></Button
-              >
-            </div>
-          {/each}
-          {#if !shownItems.length && !queryError}
-            <p class="py-12 text-center text-sm text-muted-foreground">
-              {query ? "No matching results." : projectId ? "No sessions yet." : "No projects yet."}
-            </p>
-          {/if}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  title={`Configure ${label}`}
+                  aria-label={`Configure ${label}`}
+                  onclick={() => onNavigate(`${href}/config`)}
+                  ><SquarePen size={16} /></Button
+                >
+              </div>
+            {/each}
+            {#if !shownItems.length}
+              <p class="py-12 text-center text-sm text-muted-foreground">
+                {query ? "No matching results." : projectId ? "No sessions yet." : "No projects yet."}
+              </p>
+            {/if}
+          </div>
         </div>
-      </div>
+      {/if}
     </div>
     {@const listQuery = projectId ? sessionsQuery : projectsQuery}
     {#if listQuery.hasNextPage}

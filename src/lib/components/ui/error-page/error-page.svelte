@@ -8,10 +8,15 @@ let {
   errcode,
   message,
   standalone = false,
+  compact = false,
+  onRetry,
 }: {
   errcode: number | string;
   message?: string;
   standalone?: boolean;
+  /** In-content placement (under a page's toolbar): shorter stage. */
+  compact?: boolean;
+  onRetry?: () => void;
 } = $props();
 
 const code = $derived.by(() => {
@@ -22,12 +27,18 @@ const code = $derived.by(() => {
 });
 
 // Imported through Vite so the single-file build inlines the illustrations
-// as data URIs instead of referencing publicDir paths.
+// as data URIs instead of referencing publicDir paths. Vite normalizes glob
+// keys to resolved paths (the $lib alias becomes /src/lib/...), so match by
+// file name rather than by the alias spelling.
 const illustrations = import.meta.glob<string>("$lib/assets/errors/*.png", {
   eager: true,
   import: "default",
 });
-const illustration = $derived(illustrations[`$lib/assets/errors/${code}.png`]);
+const illustration = $derived(
+  Object.entries(illustrations).find(([key]) =>
+    key.endsWith(`/${code}.png`),
+  )?.[1],
+);
 
 let canvas = $state<HTMLCanvasElement>();
 let stage = $state<HTMLDivElement>();
@@ -36,7 +47,7 @@ let webglFailed = $state(false);
 // The illustration is a plain textured plane with a gentle float; it binds
 // once at mount, so callers that switch codes should key the component.
 onMount(() => {
-  if (!canvas || !stage) return;
+  if (!canvas || !stage || !illustration) return;
   const stageEl = stage;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let renderer: THREE.WebGLRenderer;
@@ -99,14 +110,16 @@ onMount(() => {
 </script>
 
 <div
-  class={`error-stage box-border grid min-h-0 place-items-center overflow-hidden p-6 ${standalone ? "standalone" : ""}`}
+  class={`error-stage box-border grid min-h-0 place-items-center overflow-hidden p-6 ${standalone ? "standalone" : ""} ${compact ? "compact" : ""}`}
 >
   <div class="w-full max-w-2xl text-center">
     <div
       bind:this={stage}
       class="mx-auto flex h-72 w-full max-w-4xl items-center justify-center sm:h-96"
     >
-      {#if webglFailed}
+      {#if !illustration}
+      <!-- no illustration for this code -->
+      {:else if webglFailed}
         <img
           src={illustration}
           alt={`Illustration for error ${code}`}
@@ -123,6 +136,15 @@ onMount(() => {
     {#if message}
       <p class="mt-2 font-mono text-[11px] text-muted-foreground">{message}</p>
     {/if}
+    {#if onRetry}
+      <button
+        type="button"
+        class="mt-4 rounded-md border px-3 py-1.5 font-mono text-[11px] text-muted-foreground transition hover:bg-accent hover:text-foreground"
+        onclick={onRetry}
+      >
+        retry
+      </button>
+    {/if}
   </div>
 </div>
 
@@ -132,6 +154,9 @@ onMount(() => {
 }
 .error-stage.standalone {
   min-height: 100dvh;
+}
+.error-stage.compact {
+  min-height: 50dvh;
 }
 .error-stage canvas {
   transform: translateY(-2rem);

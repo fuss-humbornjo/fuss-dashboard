@@ -28,6 +28,12 @@ export class SchemaError extends Error {
   }
 }
 
+// errorStatus maps a query failure to the error page's errcode: an ApiError
+// carries the server's status (401 renders as the 403 page); anything else,
+// network or schema, reads as an internal 500.
+export const errorStatus = (cause: unknown): number =>
+  cause instanceof ApiError ? cause.status : 500;
+
 export function errorMessage(status: number): string {
   const messages: Record<number, string> = {
     401: "Authentication failed. Check the dashboard’s service token.",

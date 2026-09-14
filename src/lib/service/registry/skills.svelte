@@ -2,8 +2,10 @@
 import { Plus, Puzzle } from "@lucide/svelte";
 import { createQuery, useQueryClient } from "@tanstack/svelte-query";
 import PageHeading from "../../components/layout/page-heading.svelte";
+import { ErrorPage } from "../../components/ui/error-page";
 import { Input } from "../../components/ui/input";
 import { SelectSimple as Select } from "../../components/ui/select/index.js";
+import { errorStatus } from "../rpc";
 import { listAllSkills, listScopes } from "./api";
 import SkillUpload from "./skill-upload.svelte";
 
@@ -128,17 +130,12 @@ function retry() {
     {/each}
   </div>
 {:else if loadError}
-  <div role="alert" class="rounded-xl border bg-card p-5">
-    <p class="text-label text-muted-foreground">Registry unavailable</p>
-    <p class="mt-2 text-sm text-destructive">{message(loadError)}</p>
-    <button
-      type="button"
-      class="mt-4 rounded-md border px-3 py-1.5 font-mono text-[11px] text-muted-foreground transition hover:bg-accent hover:text-foreground"
-      onclick={retry}
-    >
-      retry
-    </button>
-  </div>
+  <ErrorPage
+    compact
+    errcode={errorStatus(loadError)}
+    message={message(loadError)}
+    onRetry={retry}
+  />
 {:else if filtered.length}
   <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
     {#each filtered as skill (skill.id)}

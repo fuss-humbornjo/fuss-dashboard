@@ -66,3 +66,12 @@ pnpm quality      # check + Biome check
 ```
 
 Routes are handled client-side in `src/App.svelte`.
+
+## Acknowledgments
+
+The error page illustrations (`src/lib/assets/errors/`) are by
+[さわらつき (SAWARATSUKI)](https://github.com/SAWARATSUKI), from the
+[KawaiiLogos](https://github.com/SAWARATSUKI/KawaiiLogos) series. They are
+not covered by this repository's MIT license; the KawaiiLogos terms apply
+instead: free for personal use, with commercial use requiring the rights
+holder's permission.
